@@ -37,6 +37,10 @@ public record ConversionRule(
                             .forGetter(ConversionRule::overrideLootTableToDisplay))
             .apply(i, ConversionRule::new));
 
+    // どの規則も距離を書かなければ、バニラの初期値を使う。VaultConfig.DEFAULT と同じ値（DEFAULT は公開されていない）
+    private static final double VANILLA_ACTIVATION_RANGE = 4.0;
+    private static final double VANILLA_DEACTIVATION_RANGE = 4.5;
+
     boolean matches(String lootTableId) {
         return patterns.stream().anyMatch(glob -> Glob.matches(glob, lootTableId));
     }
@@ -44,7 +48,7 @@ public record ConversionRule(
     /**
      * 規則の照合。当てはまる規則を priority の小さい順（同じなら ID の順）に適用し、書かれている項目だけを上書きする。
      *
-     * @throws IllegalStateException 値がそろわないとき（起動時の検証は plan §8 の3）
+     * @throws IllegalStateException どの規則も key_item を書かないとき（起動時の検証は plan §8 の3）
      */
     static VaultConfig resolve(Map<ResourceLocation, ConversionRule> rules, ResourceKey<LootTable> lootTable) {
         String id = lootTable.location().toString();
@@ -69,17 +73,13 @@ public record ConversionRule(
             display = rule.overrideLootTableToDisplay.isPresent() ? rule.overrideLootTableToDisplay : display;
         }
 
-        List<String> missing = new ArrayList<>();
-        if (keyItem.isEmpty()) missing.add("key_item");
-        if (activationRange.isEmpty()) missing.add("activation_range");
-        if (deactivationRange.isEmpty()) missing.add("deactivation_range");
-        if (!missing.isEmpty()) {
-            throw new IllegalStateException("[chest2vault] no rule gives " + missing + " for " + id);
+        if (keyItem.isEmpty()) {
+            throw new IllegalStateException("[chest2vault] no rule gives key_item for " + id);
         }
         return new VaultConfig(
                 lootTable,
-                activationRange.get(),
-                deactivationRange.get(),
+                activationRange.orElse(VANILLA_ACTIVATION_RANGE),
+                deactivationRange.orElse(VANILLA_DEACTIVATION_RANGE),
                 keyItem.get().copy(),
                 display);
     }

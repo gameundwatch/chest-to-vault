@@ -91,6 +91,15 @@ class ConversionRuleTest {
     }
 
     @Test
+    void rangesFallBackToVanillaDefaults() {
+        ConversionRule keyOnly =
+                rule("{\"priority\": 0, \"patterns\": [\"*\"], \"key_item\": {\"id\": \"minecraft:trial_key\"}}");
+        VaultConfig c = ConversionRule.resolve(Map.of(id("key_only"), keyOnly), BuiltInLootTables.SIMPLE_DUNGEON);
+        assertEquals(4.0, c.activationRange());
+        assertEquals(4.5, c.deactivationRange());
+    }
+
+    @Test
     void higherPriorityOverridesOnlyWrittenFields() {
         ConversionRule dungeon = rule("""
                 {"priority": 100, "patterns": ["minecraft:chests/simple_dungeon"],

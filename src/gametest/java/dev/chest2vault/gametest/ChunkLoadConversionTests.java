@@ -63,7 +63,7 @@ public final class ChunkLoadConversionTests {
         helper.runAfterDelay(WAIT_TICKS, () -> {
             assertVault(helper, POS, BuiltInLootTables.SIMPLE_DUNGEON);
             helper.assertBlockProperty(POS, VaultBlock.FACING, Direction.EAST);
-            // 組み込みの規則 chest2vault:default の値
+            // 鍵は組み込みの規則 chest2vault:default、距離はバニラの初期値
             VaultConfig config = helper.<VaultBlockEntity>getBlockEntity(POS).getConfig();
             helper.assertTrue(config.keyItem().is(Items.TRIAL_KEY), "key_item should be minecraft:trial_key");
             helper.assertValueEqual(config.activationRange(), 4.0, "activation_range");

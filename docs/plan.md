@@ -128,7 +128,7 @@ flowchart TD
 | `priority` | 適用する順番（必須）。小さい順に適用し、あとのものが優先される。同じ値なら ID の順 |
 | `patterns` | 当てはまるルートテーブルの ID（必須。glob。複数書ける） |
 | `key_item` | 鍵（ItemStack の JSON：`id`・`count`・`components`） |
-| `activation_range` / `deactivation_range` | 反応する距離 |
+| `activation_range` / `deactivation_range` | 反応する距離。どの規則も書かなければバニラの初期値（4.0／4.5） |
 | `override_loot_table_to_display` | 檻の中の表示に使うルートテーブル。`null` は書いていないのと同じ。どの規則も書かなければチェストのルートテーブル |
 
 #### 照合
@@ -136,13 +136,13 @@ flowchart TD
 - `patterns` は glob で書く（例：`minecraft:chests/village/*`、`othermod:*`）。
 - あるルートテーブルに当てはまる規則を `priority` の順に適用し、**書かれている項目だけ**を上書きする。
 - 全体の値は、`patterns: ["*"]` の規則（組み込みの `chest2vault:default`、priority 0）で与える。
-- 照合の結果は、バニラの `VaultConfig` として変換に渡す。値がそろわなければ、変換のときに例外で止まる（起動時の検証は §8 の3）。
+- 照合の結果は、バニラの `VaultConfig` として変換に渡す。鍵が決まらなければ、変換のときに例外で止まる（起動時の検証は §8 の3）。
 - 規則の並び順が必要なのは、1つのルートテーブルに複数の規則が当てはまり、同じ項目を書いているとき。レジストリの項目には順序がないので、`priority` で表す。
 
 #### 検証（不正を握りつぶさない）
 
 - 書式が不正な規則があれば、ワールドの読み込みが止まる（バニラの `RegistryDataLoader` の動き）。
-- ワールドの起動時に、読み込まれているルートテーブルのうち**ブラックリストに当てはまらないもの**について、値がそろうかを確かめる。そろわなければ止める。
+- ワールドの起動時に、読み込まれているルートテーブルのうち**ブラックリストに当てはまらないもの**について、鍵（`key_item`）が決まるかを確かめる。決まらなければ止める。
 - 値が足りなくて不便に感じたら、フォールバックをあとで入れる。
 
 #### 例
@@ -152,10 +152,7 @@ flowchart TD
 {
   "priority": 0,
   "patterns": ["*"],
-  "key_item": { "id": "minecraft:trial_key", "count": 1 },
-  "activation_range": 4.0,
-  "deactivation_range": 4.5,
-  "override_loot_table_to_display": null
+  "key_item": { "id": "minecraft:trial_key", "count": 1 }
 }
 ```
 
