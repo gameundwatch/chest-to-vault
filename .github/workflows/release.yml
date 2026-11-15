@@ -1,0 +1,59 @@
+name: Release
+
+# main に入ったら、gradle.properties の mod_version でリリースを作る。
+# 同じ版のリリースがすでにあれば何もしない（版を上げたときだけリリースされる）。
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: echo "version=$(grep '^mod_version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: Check existing release
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ steps.version.outputs.version }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "::notice::$TAG already exists; skipping release"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-java@v4
+        if: steps.existing.outputs.exists == 'false'
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.existing.outputs.exists == 'false'
+
+      - name: Test
+        if: steps.existing.outputs.exists == 'false'
+        run: ./gradlew check runGameTestServer
+
+      - name: Build
+        if: steps.existing.outputs.exists == 'false'
+        run: ./gradlew jar
+
+      - name: Create release
+        if: steps.existing.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: >
+          gh release create "v$VERSION" "build/libs/chest2vault-$VERSION.jar"
+          --target "$GITHUB_SHA" --title "v$VERSION" --generate-notes
