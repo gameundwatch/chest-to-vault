@@ -236,7 +236,7 @@ flowchart TD
 - バニラの Vault に、状態 `appearance`（見た目）を Mixin で足す。値は `vault`（初期値）と `barrel`。値が決まっていなければ `vault` なので、バニラの Vault と整合する。チェストから変換したものは `vault` のまま。
 - 樽から変換したものは `appearance=barrel` にする。
 - 向き：Vault は水平の4方向だけ。横向きの樽は同じ向き、上・下向きの樽は北向きにする。
-- 見た目：Vault の見た目の定義（`assets/minecraft/blockstates/vault.json`）を Mod で上書きし、`appearance=barrel` には樽のモデルを使う。絵はバニラの樽のものだけを使う（新しい絵は後で）。上にふたがある樽の見た目にする。
+- 見た目：Vault の見た目の定義（`assets/minecraft/blockstates/vault.json`）を Mod で上書きし、`appearance=barrel` には樽のモデルを使う。絵はバニラの樽のものだけを使う（新しい絵は後で）。上にふたがある樽の見た目にする。Vault が開いている間（`vault_state` が `unlocking`・`ejecting`）は、開いた樽のモデルにする。
 - 用語：見た目（VaultAppearance）。
 ## 5. 既知の影響・リスク
 

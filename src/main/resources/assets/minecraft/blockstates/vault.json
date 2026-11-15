@@ -120,17 +120,17 @@
       "model": "minecraft:block/vault_unlocking_ominous",
       "y": 270
     },
-    "appearance=barrel,facing=north": {
+    "appearance=barrel,vault_state=inactive": {
       "model": "minecraft:block/barrel"
     },
-    "appearance=barrel,facing=east": {
+    "appearance=barrel,vault_state=active": {
       "model": "minecraft:block/barrel"
     },
-    "appearance=barrel,facing=south": {
-      "model": "minecraft:block/barrel"
+    "appearance=barrel,vault_state=unlocking": {
+      "model": "minecraft:block/barrel_open"
     },
-    "appearance=barrel,facing=west": {
-      "model": "minecraft:block/barrel"
+    "appearance=barrel,vault_state=ejecting": {
+      "model": "minecraft:block/barrel_open"
     }
   }
 }
