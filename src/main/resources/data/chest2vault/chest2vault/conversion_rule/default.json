@@ -1,3 +1,12 @@
 {
-  "priority": 0
+  "priority": 0,
+  "patterns": [
+    "*"
+  ],
+  "key_item": {
+    "id": "minecraft:trial_key",
+    "count": 1
+  },
+  "activation_range": 4.0,
+  "deactivation_range": 4.5
 }

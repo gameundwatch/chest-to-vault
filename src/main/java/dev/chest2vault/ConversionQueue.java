@@ -2,13 +2,17 @@ package dev.chest2vault;
 
 import com.mojang.logging.LogUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.entity.vault.VaultConfig;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.neoforge.event.level.ChunkEvent;
@@ -59,7 +63,13 @@ final class ConversionQueue {
         if (!Target.isTarget(state, chest.getLootTable(), Config.blacklist())) {
             return;
         }
-        if (Replacement.replace(level, pos, state, chest)) {
+        Map<ResourceLocation, ConversionRule> rules = new HashMap<>();
+        level.registryAccess()
+                .registryOrThrow(ConversionRule.REGISTRY_KEY)
+                .entrySet()
+                .forEach(e -> rules.put(e.getKey().location(), e.getValue()));
+        VaultConfig config = ConversionRule.resolve(rules, chest.getLootTable());
+        if (Replacement.replace(level, pos, state, chest, config)) {
             LOGGER.info(
                     "[chest2vault] converted chest at {} in {}",
                     pos,

@@ -7,11 +7,13 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
+import net.minecraft.world.level.block.entity.vault.VaultConfig;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
@@ -61,6 +63,11 @@ public final class ChunkLoadConversionTests {
         helper.runAfterDelay(WAIT_TICKS, () -> {
             assertVault(helper, POS, BuiltInLootTables.SIMPLE_DUNGEON);
             helper.assertBlockProperty(POS, VaultBlock.FACING, Direction.EAST);
+            // 組み込みの規則 chest2vault:default の値
+            VaultConfig config = helper.<VaultBlockEntity>getBlockEntity(POS).getConfig();
+            helper.assertTrue(config.keyItem().is(Items.TRIAL_KEY), "key_item should be minecraft:trial_key");
+            helper.assertValueEqual(config.activationRange(), 4.0, "activation_range");
+            helper.assertValueEqual(config.deactivationRange(), 4.5, "deactivation_range");
             helper.assertEntityNotPresent(EntityType.ITEM);
             helper.succeed();
         });
