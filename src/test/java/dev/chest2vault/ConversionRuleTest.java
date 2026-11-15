@@ -1,7 +1,6 @@
 package dev.chest2vault;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.JsonParser;
@@ -82,7 +81,8 @@ class ConversionRuleTest {
 
     @Test
     void defaultRuleGivesAllValues() {
-        VaultConfig c = ConversionRule.resolve(Map.of(id("default"), DEFAULT), BuiltInLootTables.SIMPLE_DUNGEON);
+        VaultConfig c = ConversionRule.resolve(Map.of(id("default"), DEFAULT), BuiltInLootTables.SIMPLE_DUNGEON)
+                .getOrThrow();
         assertEquals(BuiltInLootTables.SIMPLE_DUNGEON, c.lootTable());
         assertTrue(c.keyItem().is(Items.TRIAL_KEY));
         assertEquals(4.0, c.activationRange());
@@ -94,7 +94,8 @@ class ConversionRuleTest {
     void rangesFallBackToVanillaDefaults() {
         ConversionRule keyOnly =
                 rule("{\"priority\": 0, \"patterns\": [\"*\"], \"key_item\": {\"id\": \"minecraft:trial_key\"}}");
-        VaultConfig c = ConversionRule.resolve(Map.of(id("key_only"), keyOnly), BuiltInLootTables.SIMPLE_DUNGEON);
+        VaultConfig c = ConversionRule.resolve(Map.of(id("key_only"), keyOnly), BuiltInLootTables.SIMPLE_DUNGEON)
+                .getOrThrow();
         assertEquals(4.0, c.activationRange());
         assertEquals(4.5, c.deactivationRange());
     }
@@ -105,7 +106,8 @@ class ConversionRuleTest {
                 {"priority": 100, "patterns": ["minecraft:chests/simple_dungeon"],
                  "key_item": {"id": "minecraft:ominous_trial_key"}}""");
         VaultConfig c = ConversionRule.resolve(
-                Map.of(id("default"), DEFAULT, id("dungeon"), dungeon), BuiltInLootTables.SIMPLE_DUNGEON);
+                        Map.of(id("default"), DEFAULT, id("dungeon"), dungeon), BuiltInLootTables.SIMPLE_DUNGEON)
+                .getOrThrow();
         assertTrue(c.keyItem().is(Items.OMINOUS_TRIAL_KEY));
         assertEquals(4.0, c.activationRange());
     }
@@ -115,7 +117,8 @@ class ConversionRuleTest {
         ConversionRule other = rule("""
                 {"priority": 100, "patterns": ["othermod:*"], "key_item": {"id": "minecraft:ominous_trial_key"}}""");
         VaultConfig c = ConversionRule.resolve(
-                Map.of(id("default"), DEFAULT, id("other"), other), BuiltInLootTables.SIMPLE_DUNGEON);
+                        Map.of(id("default"), DEFAULT, id("other"), other), BuiltInLootTables.SIMPLE_DUNGEON)
+                .getOrThrow();
         assertTrue(c.keyItem().is(Items.TRIAL_KEY));
     }
 
@@ -124,27 +127,29 @@ class ConversionRuleTest {
         ConversionRule a = rule("{\"priority\": 10, \"patterns\": [\"*\"], \"activation_range\": 1.0}");
         ConversionRule b = rule("{\"priority\": 10, \"patterns\": [\"*\"], \"activation_range\": 2.0}");
         VaultConfig c = ConversionRule.resolve(
-                Map.of(id("default"), DEFAULT, id("b"), b, id("a"), a), BuiltInLootTables.SIMPLE_DUNGEON);
+                        Map.of(id("default"), DEFAULT, id("b"), b, id("a"), a), BuiltInLootTables.SIMPLE_DUNGEON)
+                .getOrThrow();
         assertEquals(2.0, c.activationRange()); // test:b は test:a のあと
     }
 
     @Test
-    void throwsWhenValuesAreMissing() {
+    void errorsWhenValuesAreMissing() {
         ConversionRule partial = rule("{\"priority\": 0, \"patterns\": [\"*\"], \"activation_range\": 1.0}");
-        assertThrows(
-                IllegalStateException.class,
-                () -> ConversionRule.resolve(Map.of(id("partial"), partial), BuiltInLootTables.SIMPLE_DUNGEON));
+        assertTrue(ConversionRule.resolve(Map.of(id("partial"), partial), BuiltInLootTables.SIMPLE_DUNGEON)
+                .isError());
     }
 
     @Test
     void keyItemIsCopiedPerVault() {
         Map<ResourceLocation, ConversionRule> rules = Map.of(id("default"), DEFAULT);
-        ItemStack first =
-                ConversionRule.resolve(rules, BuiltInLootTables.SIMPLE_DUNGEON).keyItem();
+        ItemStack first = ConversionRule.resolve(rules, BuiltInLootTables.SIMPLE_DUNGEON)
+                .getOrThrow()
+                .keyItem();
         first.setCount(64);
         assertEquals(
                 1,
                 ConversionRule.resolve(rules, BuiltInLootTables.SIMPLE_DUNGEON)
+                        .getOrThrow()
                         .keyItem()
                         .getCount());
     }

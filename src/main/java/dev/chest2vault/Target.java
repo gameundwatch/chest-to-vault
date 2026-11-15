@@ -2,6 +2,7 @@ package dev.chest2vault;
 
 import java.util.List;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -23,7 +24,12 @@ final class Target {
         if (lootTable == null) {
             return false; // 開封済み
         }
-        String id = lootTable.location().toString();
-        return blacklist.stream().noneMatch(glob -> Glob.matches(glob, id));
+        return !isBlacklisted(lootTable.location(), blacklist);
+    }
+
+    /** ブラックリストのどれか1つの glob に当てはまるか。 */
+    static boolean isBlacklisted(ResourceLocation lootTable, List<? extends String> blacklist) {
+        String id = lootTable.toString();
+        return blacklist.stream().anyMatch(glob -> Glob.matches(glob, id));
     }
 }

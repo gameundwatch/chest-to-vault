@@ -1,13 +1,16 @@
 package dev.chest2vault;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -41,6 +44,16 @@ public record ConversionRule(
     private static final double VANILLA_ACTIVATION_RANGE = 4.0;
     private static final double VANILLA_DEACTIVATION_RANGE = 4.5;
 
+    /** 読み込まれている規則（ID → 規則）。 */
+    static Map<ResourceLocation, ConversionRule> rules(RegistryAccess registries) {
+        Map<ResourceLocation, ConversionRule> rules = new HashMap<>();
+        registries
+                .registryOrThrow(REGISTRY_KEY)
+                .entrySet()
+                .forEach(e -> rules.put(e.getKey().location(), e.getValue()));
+        return rules;
+    }
+
     boolean matches(String lootTableId) {
         return patterns.stream().anyMatch(glob -> Glob.matches(glob, lootTableId));
     }
@@ -48,9 +61,10 @@ public record ConversionRule(
     /**
      * 規則の照合。当てはまる規則を priority の小さい順（同じなら ID の順）に適用し、書かれている項目だけを上書きする。
      *
-     * @throws IllegalStateException どの規則も key_item を書かないとき（起動時の検証は plan §8 の3）
+     * @return どの規則も key_item を書かなければ誤り
      */
-    static VaultConfig resolve(Map<ResourceLocation, ConversionRule> rules, ResourceKey<LootTable> lootTable) {
+    static DataResult<VaultConfig> resolve(
+            Map<ResourceLocation, ConversionRule> rules, ResourceKey<LootTable> lootTable) {
         String id = lootTable.location().toString();
         List<Map.Entry<ResourceLocation, ConversionRule>> matched = new ArrayList<>();
         for (Map.Entry<ResourceLocation, ConversionRule> entry : rules.entrySet()) {
@@ -74,13 +88,13 @@ public record ConversionRule(
         }
 
         if (keyItem.isEmpty()) {
-            throw new IllegalStateException("[chest2vault] no rule gives key_item for " + id);
+            return DataResult.error(() -> "no rule gives key_item for " + id);
         }
-        return new VaultConfig(
+        return DataResult.success(new VaultConfig(
                 lootTable,
                 activationRange.orElse(VANILLA_ACTIVATION_RANGE),
                 deactivationRange.orElse(VANILLA_DEACTIVATION_RANGE),
                 keyItem.get().copy(),
-                display);
+                display));
     }
 }
