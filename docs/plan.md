@@ -108,6 +108,8 @@ flowchart TD
 | 何に（to） | 規則の照合（ConversionRule） | 規則を照合し、値を決める | 触らない |
 | どう | 置き換え（Replacement） | ルートテーブルを外す → Vault → config | 触る |
 
+- 「何を → 何に → どう」をまとめて**変換（Conversion）**と呼ぶ。どの経路も同じ変換を呼ぶ。
+
 - `ChunkEvent.Load` の中ではブロックに触らず、位置を積むだけにする。その場で触るとデッドロックすることがあるため（NeoForge の注意書き）。
 - 置き換える前に、チェストからルートテーブルを外す。外さないと、壊したときに中身が抽選されて地面に落ちる（`ChestBlock.onRemove` → `Containers.dropContents` → `getItem()`）。
 - 大型チェストは、2つのブロックをそれぞれ独立した Vault にする。
