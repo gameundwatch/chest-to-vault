@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.chest2vault.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "StructureTemplateAccessor",
+    "StructureTemplateManagerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
