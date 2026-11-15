@@ -45,7 +45,7 @@
 ### v1 でやらないこと
 
 - 鍵なしで開ける仕組み（バニラの鍵の判定の書き換え）
-- 樽・シュルカーボックスなど、チェスト以外のコンテナ
+- シュルカーボックスなど、チェストと樽以外のコンテナ（樽は v0.3.0 で対象にする。§4.8）
 - チェスト付きトロッコ（エンティティなので、Vault に置き換えられない）
 - 128人上限の変更、再開封までの時間の追加
 - 専用の見た目（テクスチャ）
@@ -215,7 +215,8 @@ flowchart TD
 | ネザー要塞 | `nether_bridge` | ○ | 攻略の場所 |
 | 砦の遺跡 | `bastion_bridge`, `bastion_hoglin_stable`, `bastion_other`, `bastion_treasure` | ○ | 攻略の場所 |
 | エンドシティ | `end_city_treasure` | ○ | 攻略の場所 |
-| （チェストではない） | `abandoned_mineshaft`（チェスト付きトロッコ）, `jungle_temple_dispenser`, `trial_chambers/intersection_barrel`, `trial_chambers/reward*` | － | チェストのブロックではないので、設定に関係なく変換されない（`abandoned_mineshaft` 以外は名前からの推測で、未確認） |
+| （チェストではない） | `abandoned_mineshaft`（チェスト付きトロッコ）, `jungle_temple_dispenser`, `trial_chambers/reward*` | － | チェストのブロックではないので、設定に関係なく変換されない（`abandoned_mineshaft` 以外は名前からの推測で、未確認） |
+| （樽） | `trial_chambers/intersection_barrel` | ○（v0.3.0 から） | 試練の間のテンプレートに、このルートテーブルの樽が3つある（確認済み）。樽を対象にするので変換される。ブラックリストに入れるかは未定 |
 
 ### 4.7 命名規則
 
@@ -228,6 +229,15 @@ flowchart TD
 | クラス名（Mod の入り口） | Mod の ID（`Chest2Vault`）。登録だけを持つ |
 | クラス名（それ以外） | plan の用語の英訳（§4.2「段階」）。plan にない言葉が要るときは、先に plan に足す |
 
+
+### 4.8 樽（v0.3.0）
+
+- 樽も変換の対象にする。判定（変換対象）以外は、チェストと同じ（規則の照合、3つの経路）。
+- バニラの Vault に、状態 `appearance`（見た目）を Mixin で足す。値は `vault`（初期値）と `barrel`。値が決まっていなければ `vault` なので、バニラの Vault と整合する。チェストから変換したものは `vault` のまま。
+- 樽から変換したものは `appearance=barrel` にする。
+- 向き：Vault は水平の4方向だけ。横向きの樽は同じ向き、上・下向きの樽は北向きにする。
+- 見た目：Vault の見た目の定義（`assets/minecraft/blockstates/vault.json`）を Mod で上書きし、`appearance=barrel` には樽のモデルを使う。絵はバニラの樽のものだけを使う（新しい絵は後で）。上にふたがある樽の見た目にする。
+- 用語：見た目（VaultAppearance）。
 ## 5. 既知の影響・リスク
 
 | 項目 | 内容 | v1 の扱い |
