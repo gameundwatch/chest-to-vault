@@ -5,7 +5,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class Config {
     /** plan.md §3.4 の「対象外」。 */
-    private static final List<String> DEFAULT_BLACKLIST = List.of(
+    static final List<String> DEFAULT_BLACKLIST = List.of(
             "minecraft:chests/village/village_armorer",
             "minecraft:chests/village/village_butcher",
             "minecraft:chests/village/village_cartographer",
@@ -27,7 +27,9 @@ public final class Config {
             "minecraft:chests/shipwreck_map",
             "minecraft:chests/shipwreck_supply",
             "minecraft:chests/shipwreck_treasure",
-            "minecraft:chests/buried_treasure");
+            "minecraft:chests/buried_treasure",
+            // 試練の間のチェスト・樽は、挑戦者向けの一時置き場や補給で、宝箱ではない
+            "minecraft:chests/trial_chambers/*");
 
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 

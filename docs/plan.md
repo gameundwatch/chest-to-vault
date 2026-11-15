@@ -139,7 +139,7 @@ flowchart TD
 - 書き方：ルートテーブルの ID を glob で書く（例：`minecraft:chests/village/*`、`othermod:*`）
 - glob：`*` は `/` を含む任意の文字の並び、`?` は任意の1文字。ID 全体と照合する。照合は commons-io の `FilenameUtils.wildcardMatch`（Minecraft 自身が使っているライブラリ）に任せる。規則の `patterns` も同じ。
 - 当てはまったチェストは変換しない（ルートテーブルを持ったまま残る）
-- 初期値：§4.6 の対象外
+- 初期値：§4.6 の対象外。初期値は config ファイルを新しく作るときにだけ使われる。すでにある config ファイルには、版を上げて初期値を変えても反映されない（製作者が書き足す）
 - 不正な値は `ModConfigSpec` が WARN のログを出して初期値に直す。この動きをそのまま受け入れる（困ったら検証を足す）
 
 ### 4.5 規則（to：データパック）
@@ -215,8 +215,8 @@ flowchart TD
 | ネザー要塞 | `nether_bridge` | ○ | 攻略の場所 |
 | 砦の遺跡 | `bastion_bridge`, `bastion_hoglin_stable`, `bastion_other`, `bastion_treasure` | ○ | 攻略の場所 |
 | エンドシティ | `end_city_treasure` | ○ | 攻略の場所 |
-| （チェストではない） | `abandoned_mineshaft`（チェスト付きトロッコ）, `jungle_temple_dispenser`, `trial_chambers/reward*` | － | チェストのブロックではないので、設定に関係なく変換されない（`abandoned_mineshaft` 以外は名前からの推測で、未確認） |
-| （樽） | `trial_chambers/intersection_barrel` | ○（v0.3.0 から） | 試練の間のテンプレートに、このルートテーブルの樽が3つある（確認済み）。樽を対象にするので変換される。ブラックリストに入れるかは未定 |
+| （チェストではない） | `abandoned_mineshaft`（チェスト付きトロッコ）, `jungle_temple_dispenser` | － | チェストのブロックではないので、設定に関係なく変換されない（`jungle_temple_dispenser` は名前からの推測で、未確認） |
+| 試練の間 | `trial_chambers/*`（テンプレートに `entrance` のチェスト7、`reward` のチェスト3、`supply` のチェスト1、`intersection_barrel` の樽2、`corridor` の樽1。確認済み） | ×（v0.3.0 から） | 挑戦者向けの一時置き場や補給で、宝箱ではない。ブラックリストの初期値に `minecraft:chests/trial_chambers/*` を入れる |
 
 ### 4.7 命名規則
 
