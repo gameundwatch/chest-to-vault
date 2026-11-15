@@ -1,0 +1,11 @@
+{
+  "priority": 100,
+  "patterns": [
+    "minecraft:chests/end_city_treasure",
+    "minecraft:chests/ancient_city*"
+  ],
+  "key_item": {
+    "id": "minecraft:ominous_trial_key",
+    "count": 1
+  }
+}

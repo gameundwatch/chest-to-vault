@@ -73,6 +73,29 @@ public final class ChunkLoadConversionTests {
         });
     }
 
+    /** 組み込みの規則 chest2vault:ominous（plan §4.3）。 */
+    @GameTest(template = "empty", batch = "ominous_end_city")
+    public static void givesOminousKeyToEndCity(GameTestHelper helper) {
+        assertKeyAfterConversion(helper, BuiltInLootTables.END_CITY_TREASURE, Items.OMINOUS_TRIAL_KEY);
+    }
+
+    @GameTest(template = "empty", batch = "ominous_ancient_city")
+    public static void givesOminousKeyToAncientCity(GameTestHelper helper) {
+        assertKeyAfterConversion(helper, BuiltInLootTables.ANCIENT_CITY_ICE_BOX, Items.OMINOUS_TRIAL_KEY);
+    }
+
+    private static void assertKeyAfterConversion(
+            GameTestHelper helper, ResourceKey<LootTable> lootTable, net.minecraft.world.item.Item key) {
+        placeChest(helper, POS, Blocks.CHEST.defaultBlockState(), lootTable);
+        loadChunk(helper, POS);
+        helper.runAfterDelay(WAIT_TICKS, () -> {
+            assertVault(helper, POS, lootTable);
+            VaultConfig config = helper.<VaultBlockEntity>getBlockEntity(POS).getConfig();
+            helper.assertTrue(config.keyItem().is(key), "key_item should be " + key);
+            helper.succeed();
+        });
+    }
+
     @GameTest(template = "empty", batch = "trapped_chest")
     public static void convertsTrappedChest(GameTestHelper helper) {
         placeChest(helper, POS, Blocks.TRAPPED_CHEST.defaultBlockState(), BuiltInLootTables.SIMPLE_DUNGEON);

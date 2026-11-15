@@ -51,6 +51,7 @@
 - 専用の見た目（テクスチャ）
 - 確認用のコマンド（モックの `/chest2vault convert` は消す）
 - 鍵の仕組みの改変（ルートの差し替えとは別に扱う）
+- Vault の見た目（`ominous` の状態）と `key_item` の組み合わせの補正（次の版で行う）
 
 ## 4. 変換の仕組み
 
@@ -105,6 +106,8 @@ flowchart TD
 ### 4.3 鍵
 
 - 当面は `minecraft:trial_key`（規則 `chest2vault:default` で指定する）。
+- エンドシティと古代都市（`minecraft:chests/end_city_treasure`、`minecraft:chests/ancient_city*`）は `minecraft:ominous_trial_key`（規則 `chest2vault:ominous`、priority 100）。
+- Vault の `ominous` の状態には触らない。見た目は普通の Vault のまま、鍵だけが不吉なものになる。
 - 鍵の種類・入手方法などの仕組みは、ルートの差し替えとは別に扱う。
 
 ### 4.4 ブラックリスト（from：config）
@@ -158,8 +161,8 @@ flowchart TD
 ```
 
 ```json
-// 製作者のデータパック：data/mypack/chest2vault/conversion_rule/end_city.json
-{ "priority": 100, "patterns": ["minecraft:chests/end_city_treasure"], "key_item": { "id": "minecraft:ominous_trial_key", "count": 1 } }
+// 製作者のデータパック：data/mypack/chest2vault/conversion_rule/bastion.json
+{ "priority": 200, "patterns": ["minecraft:chests/bastion_treasure"], "key_item": { "id": "minecraft:ominous_trial_key", "count": 1 } }
 ```
 
 ### 4.6 変換対象のルートテーブル（ブラックリストの初期値）
