@@ -30,7 +30,7 @@ final class Conversion {
             return false;
         }
         LOGGER.info(
-                "[chest2vault] converted chest at {} in {}",
+                "[chest2vault] converted container at {} in {}",
                 pos,
                 level.dimension().location());
         return true;

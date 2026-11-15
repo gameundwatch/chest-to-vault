@@ -1,6 +1,7 @@
 package dev.chest2vault.gametest;
 
 import dev.chest2vault.Chest2Vault;
+import dev.chest2vault.VaultAppearance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -36,6 +37,17 @@ public final class TemplateConversionTests {
         helper.assertValueEqual(config.lootTable(), BuiltInLootTables.SIMPLE_DUNGEON, "loot table");
         helper.assertTrue(config.keyItem().is(Items.TRIAL_KEY), "key_item should be minecraft:trial_key");
         helper.assertEntityNotPresent(EntityType.ITEM);
+        helper.succeed();
+    }
+
+    /** 上向きの樽のテンプレート。北向き・見た目 barrel の Vault になる。 */
+    @GameTest(template = "template_loot_barrel", batch = "template_loot_barrel")
+    public static void rewritesUpwardBarrelInTemplate(GameTestHelper helper) {
+        helper.assertBlockPresent(Blocks.VAULT, POS);
+        helper.assertBlockProperty(POS, VaultBlock.FACING, Direction.NORTH);
+        helper.assertBlockProperty(POS, VaultAppearance.PROPERTY, VaultAppearance.BARREL);
+        VaultConfig config = helper.<VaultBlockEntity>getBlockEntity(POS).getConfig();
+        helper.assertValueEqual(config.lootTable(), BuiltInLootTables.SIMPLE_DUNGEON, "loot table");
         helper.succeed();
     }
 

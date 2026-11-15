@@ -1,6 +1,7 @@
 package dev.chest2vault.gametest;
 
 import dev.chest2vault.Chest2Vault;
+import dev.chest2vault.VaultAppearance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -10,8 +11,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.BlockHitResult;
@@ -28,10 +30,14 @@ public final class OpenConversionTests {
     private OpenConversionTests() {}
 
     private static void placeChest(GameTestHelper helper, ResourceKey<LootTable> lootTable) {
-        helper.setBlock(POS, Blocks.CHEST.defaultBlockState());
+        place(helper, Blocks.CHEST.defaultBlockState(), lootTable);
+    }
+
+    private static void place(GameTestHelper helper, BlockState state, ResourceKey<LootTable> lootTable) {
+        helper.setBlock(POS, state);
         if (lootTable != null) {
-            ChestBlockEntity chest = helper.getBlockEntity(POS);
-            chest.setLootTable(lootTable);
+            RandomizableContainerBlockEntity container = helper.getBlockEntity(POS);
+            container.setLootTable(lootTable);
         }
     }
 
@@ -60,6 +66,17 @@ public final class OpenConversionTests {
         helper.assertValueEqual(vault.getConfig().lootTable(), BuiltInLootTables.SIMPLE_DUNGEON, "loot table");
         helper.assertTrue(player.containerMenu == player.inventoryMenu, "the right click should not open a menu");
         helper.assertEntityNotPresent(EntityType.ITEM);
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", batch = "open_loot_barrel")
+    public static void convertsLootBarrelAndStopsOpening(GameTestHelper helper) {
+        place(helper, Blocks.BARREL.defaultBlockState(), BuiltInLootTables.SIMPLE_DUNGEON);
+        ServerPlayer player = rightClick(helper);
+
+        helper.assertBlockPresent(Blocks.VAULT, POS);
+        helper.assertBlockProperty(POS, VaultAppearance.PROPERTY, VaultAppearance.BARREL);
+        helper.assertTrue(player.containerMenu == player.inventoryMenu, "the right click should not open a menu");
         helper.succeed();
     }
 

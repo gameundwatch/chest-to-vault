@@ -23,8 +23,14 @@ class TargetTest {
     }
 
     @Test
+    void barrelWithLootTableIsTarget() {
+        assertTrue(Target.isTarget(Blocks.BARREL.defaultBlockState(), BuiltInLootTables.SIMPLE_DUNGEON, NO_BLACKLIST));
+    }
+
+    @Test
     void otherContainerIsNotTarget() {
-        assertFalse(Target.isTarget(Blocks.BARREL.defaultBlockState(), BuiltInLootTables.SIMPLE_DUNGEON, NO_BLACKLIST));
+        assertFalse(
+                Target.isTarget(Blocks.DISPENSER.defaultBlockState(), BuiltInLootTables.SIMPLE_DUNGEON, NO_BLACKLIST));
     }
 
     @Test
