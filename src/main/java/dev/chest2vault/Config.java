@@ -32,7 +32,7 @@ public final class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     private static final ModConfigSpec.ConfigValue<List<? extends String>> BLACKLIST = BUILDER.comment(
-                    "Loot table IDs that are NOT converted to Vaults (glob: * matches any characters, including /).",
+                    "Loot table IDs that are NOT converted to Vaults (glob: * matches any characters including /, ? matches one character).",
                     "Example: [\"minecraft:chests/village/*\", \"othermod:*\"]")
             .defineListAllowEmpty("blacklist", DEFAULT_BLACKLIST, () -> "", o -> o instanceof String);
 
