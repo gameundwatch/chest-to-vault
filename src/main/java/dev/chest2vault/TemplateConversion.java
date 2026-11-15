@@ -11,9 +11,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ChestBlock;
-import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import net.minecraft.world.level.block.entity.vault.VaultConfig;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,7 +40,7 @@ public final class TemplateConversion {
             rewritten += rewrite(palette.blocks(), rules, Config.blacklist(), server.registryAccess());
         }
         if (rewritten > 0) {
-            LOGGER.info("[chest2vault] rewrote {} chests in template {}", rewritten, id);
+            LOGGER.info("[chest2vault] rewrote {} containers in template {}", rewritten, id);
         }
     }
 
@@ -62,9 +59,7 @@ public final class TemplateConversion {
             }
             // 値がそろうことは、起動時の検証（Validation）で確かめてある
             VaultConfig config = ConversionRule.resolve(rules, lootTable).getOrThrow();
-            BlockState vaultState = Blocks.VAULT
-                    .defaultBlockState()
-                    .setValue(VaultBlock.FACING, info.state().getValue(ChestBlock.FACING));
+            BlockState vaultState = Replacement.vaultState(info.state());
             blocks.set(
                     i,
                     new StructureTemplate.StructureBlockInfo(

@@ -1,6 +1,7 @@
 package dev.chest2vault.gametest;
 
 import dev.chest2vault.Chest2Vault;
+import dev.chest2vault.VaultAppearance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -8,10 +9,12 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import net.minecraft.world.level.block.entity.vault.VaultConfig;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,8 +40,8 @@ public final class ChunkLoadConversionTests {
             GameTestHelper helper, BlockPos pos, BlockState state, ResourceKey<LootTable> lootTable) {
         helper.setBlock(pos, state);
         if (lootTable != null) {
-            ChestBlockEntity chest = helper.getBlockEntity(pos);
-            chest.setLootTable(lootTable);
+            RandomizableContainerBlockEntity container = helper.getBlockEntity(pos);
+            container.setLootTable(lootTable);
         }
     }
 
@@ -92,6 +95,45 @@ public final class ChunkLoadConversionTests {
             assertVault(helper, POS, lootTable);
             VaultConfig config = helper.<VaultBlockEntity>getBlockEntity(POS).getConfig();
             helper.assertTrue(config.keyItem().is(key), "key_item should be " + key);
+            helper.succeed();
+        });
+    }
+
+    /** 樽（plan §4.8）。横向きは同じ向き、見た目は barrel。 */
+    @GameTest(template = "empty", batch = "barrel_side")
+    public static void convertsSidewaysBarrel(GameTestHelper helper) {
+        assertBarrelConversion(helper, Direction.EAST, Direction.EAST);
+    }
+
+    /** 上向きの樽は北向きの Vault になる。 */
+    @GameTest(template = "empty", batch = "barrel_up")
+    public static void convertsUpwardBarrelFacingNorth(GameTestHelper helper) {
+        assertBarrelConversion(helper, Direction.UP, Direction.NORTH);
+    }
+
+    private static void assertBarrelConversion(GameTestHelper helper, Direction barrelFacing, Direction vaultFacing) {
+        placeChest(
+                helper,
+                POS,
+                Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, barrelFacing),
+                BuiltInLootTables.SIMPLE_DUNGEON);
+        loadChunk(helper, POS);
+        helper.runAfterDelay(WAIT_TICKS, () -> {
+            assertVault(helper, POS, BuiltInLootTables.SIMPLE_DUNGEON);
+            helper.assertBlockProperty(POS, VaultBlock.FACING, vaultFacing);
+            helper.assertBlockProperty(POS, VaultAppearance.PROPERTY, VaultAppearance.BARREL);
+            helper.assertEntityNotPresent(EntityType.ITEM);
+            helper.succeed();
+        });
+    }
+
+    /** チェストから変換したものの見た目は、これまでどおり vault。 */
+    @GameTest(template = "empty", batch = "chest_appearance")
+    public static void keepsVaultAppearanceForChest(GameTestHelper helper) {
+        placeChest(helper, POS, Blocks.CHEST.defaultBlockState(), BuiltInLootTables.SIMPLE_DUNGEON);
+        loadChunk(helper, POS);
+        helper.runAfterDelay(WAIT_TICKS, () -> {
+            helper.assertBlockProperty(POS, VaultAppearance.PROPERTY, VaultAppearance.VAULT);
             helper.succeed();
         });
     }

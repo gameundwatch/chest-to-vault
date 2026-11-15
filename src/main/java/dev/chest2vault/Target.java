@@ -13,12 +13,12 @@ final class Target {
     private Target() {}
 
     /**
-     * @param lootTable チェストのルートテーブル。開封済みなら null
+     * @param lootTable チェスト・樽のルートテーブル。開封済みなら null
      * @param blacklist ルートテーブルの ID の glob（plan §4.4）
      */
     static boolean isTarget(
             BlockState state, @Nullable ResourceKey<LootTable> lootTable, List<? extends String> blacklist) {
-        if (!state.is(Blocks.CHEST) && !state.is(Blocks.TRAPPED_CHEST)) {
+        if (!state.is(Blocks.CHEST) && !state.is(Blocks.TRAPPED_CHEST) && !state.is(Blocks.BARREL)) {
             return false;
         }
         if (lootTable == null) {
