@@ -129,6 +129,7 @@ flowchart TD
 
 - 置き場所：`config/chest2vault-common.toml` の `blacklist`（COMMON。全ワールドで共通）
 - 書き方：ルートテーブルの ID を glob で書く（例：`minecraft:chests/village/*`、`othermod:*`）
+- glob：`*` は `/` を含む任意の文字の並び、`?` は任意の1文字。ID 全体と照合する。照合は commons-io の `FilenameUtils.wildcardMatch`（Minecraft 自身が使っているライブラリ）に任せる。規則の `patterns` も同じ。
 - 当てはまったチェストは変換しない（ルートテーブルを持ったまま残る）
 - 初期値：§4.6 の対象外
 - 不正な値は `ModConfigSpec` が WARN のログを出して初期値に直す。この動きをそのまま受け入れる（困ったら検証を足す）

@@ -35,6 +35,17 @@ class GlobTest {
     }
 
     @Test
+    void questionMarkMatchesOneCharacter() {
+        assertTrue(Glob.matches("minecraft:chests/ancient_city?ice_box", "minecraft:chests/ancient_city_ice_box"));
+        assertFalse(Glob.matches("minecraft:chests/ancient_city?", "minecraft:chests/ancient_city"));
+    }
+
+    @Test
+    void isCaseSensitive() {
+        assertFalse(Glob.matches("Minecraft:*", "minecraft:chests/simple_dungeon"));
+    }
+
+    @Test
     void treatsRegexCharactersLiterally() {
         assertTrue(Glob.matches("my.mod:chests/a+b", "my.mod:chests/a+b"));
         assertFalse(Glob.matches("my.mod:chests/a+b", "myxmod:chests/aab"));
