@@ -21,5 +21,6 @@ public final class Chest2Vault {
         NeoForge.EVENT_BUS.addListener(queue::onChunkLoad);
         NeoForge.EVENT_BUS.addListener(queue::onServerTick);
         NeoForge.EVENT_BUS.addListener(Validation::onServerStarting);
+        NeoForge.EVENT_BUS.addListener(OpenConversion::onRightClickBlock);
     }
 }
